@@ -1,0 +1,42 @@
+name: Build and Test .NET Library
+
+on:
+  push:
+    branches: [ "main" ] # Le workflow s'exécute sur les push dans "main"
+  pull_request:
+    branches: [ "main" ] # Et sur les pull requests vers "main"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Récupérer le code source depuis GitHub
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Configurer .NET (ajustez la version si nécessaire)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 3. Restaurer les dépendances
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # 4. Construire le projet
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    # 5. Exécuter les tests unitaires
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
+
+    # 6. Publier les artefacts (fichiers .dll, .pdb, etc.)
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: MiniRPGDuel_Build
+        path: ./bin/Release/
