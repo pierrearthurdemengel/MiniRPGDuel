@@ -1,0 +1,41 @@
+name: .NET Build and Publish Artifacts
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # Étape 1 : Récupérer le code source
+    - uses: actions/checkout@v4
+
+    # Étape 2 : Configurer .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # Étape 3 : Restaurer les dépendances
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Étape 4 : Construire le projet
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    # Étape 5 : Archiver les artefacts compilés
+    - name: Publish build artifacts
+      run: |
+        mkdir -p output
+        cp -R ./bin/Release/* ./output/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: MiniRPGDuel_Build
+        path: ./output/
